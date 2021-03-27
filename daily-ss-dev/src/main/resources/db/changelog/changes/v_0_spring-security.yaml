@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1613266891187-01
+      author: Nikita Pakhomov (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: verification_codePK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: account_id
+                  type: BIGINT
+            tableName: verification_code
+  - changeSet:
+      id: 1613266891187-02
+      author: Nikita Pakhomov (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: account_id
+            baseTableName: verification_code
+            constraintName: FKn1v88epjv0xug2pr7nwamcboh
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: account
+            validate: true
+  - changeSet:
+      id: 1613266891187-03
+      author: Nikita Pakhomov (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: email_verified
+                  type: boolean
+            tableName: account
+  - changeSet:
+      id: 1613266891187-04
+      author: Nikita Pakhomov (generated)
+      changes:
+        - sql: UPDATE account SET email_verified = TRUE;
+  - changeSet:
+      id: 1613266891187-05
+      author: Nikita Pakhomov (generated)
+      changes:
+        - addNotNullConstraint:
+            columnDataType: boolean
+            columnName: email_verified
+            tableName: account
+            validate: true

@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="modules/component :: compoment_head">
+    <title>NewsPortal</title>
+</head>
+
+<body>
+
+<div th:insert="modules/component :: alert_m(class='danger', title='Ошибка', text='Неоходимо добавить теги.')" th:if="${noTagsException}"></div>
+
+
+<!-- Навигация -->
+<header th:insert="modules/component :: header"></header>
+
+<!--Заголовок раздела-->
+<div th:replace="modules/component :: section_title(text='добавление новости по ссылке')"></div>
+
+<!--Внутренняя навигация раздела-->
+<div th:replace="modules/component :: internal_navigation(submenu=true, path_section='news/by_link', add=true, full_list=false, search_on=false)"></div><br>
+
+<!--Форма добавления ссылки-->
+<div class="container">
+    <form th:action="@{${base_url}}">
+
+        <div class="form-group">
+            <label for="link">Ссылка:</label>
+            <input name="url" th:field="${request.url}" type="text" class="form-control" id="link"
+                   th:class="${exception} ? 'form-control is-invalid' : 'form-control'">
+            <div th:if="${exception}"
+                 th:text="'Ошибка: ' + ${exception}"
+                 class="invalid-feedback">Неверная ссылка...
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-dark">Посмотреть</button>
+        <a th:href="@{${base_url}}" type="button" class="btn btn-outline-secondary">Очистить</a>
+    </form>
+</div><br><br>
+
+<!--Админ: блок предпросмотра новости-->
+<div class="container"  th:if="${dataNews}">
+
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="my-4">Предпросмотр перед сохранением</h1>
+            <form th:href="@{${base_url}}"  th:object="${request}" method="post">
+
+                <div th:fragment="news_preview" class="card mb-4">
+                    <a  th:href="${dataNews.url}">
+                        <img class="card-img-top" th:src="${dataNews.image}" alt="Card image cap">
+                    </a>
+                    <div class="card-body">
+                        <h2 th:text="${dataNews.title}" class="card-title">...</h2>
+                        <p th:text="${dataNews.description}" class="card-text">...</p>
+                        <a th:href="${dataNews.url}" class="btn btn-primary">Подробнее &rarr;</a>
+                    </div>
+                    <div class="card-footer text-muted" >
+                        <span th:text="'Опубликовано: ' + ${#temporals.format(dataNews.datePublication, 'dd-MM-yyyy HH:mm')} + '. Источник:'"></span>
+                        <a th:href="${dataNews.url}" th:text="${dataNews.siteName}">...</a>
+                    </div>
+
+                    <!--Добавленные теги-->
+                    <div class="card-footer">
+                        <span>Теги: </span>
+
+                        <span th:each="stag : ${dataNews.selectTags}" th:unless="${#sets.isEmpty(dataNews.selectTags)}">
+                            <span name="idTags" th:value="${stag.id}" th:text="${stag.tagName}" class="badge badge-primary">...</span>
+                        </span>
+
+                        <span th:if="${#sets.isEmpty(dataNews.selectTags)}" class="badge badge-danger">Необходимо добавить теги</span>
+
+                    </div>
+                </div>
+
+                <button th:disabled="${#sets.isEmpty(dataNews.selectTags)}" type="submit" class="btn btn-dark">Сохранить</button>
+                <a th:href="@{${base_url}}" type="button" class="btn btn-outline-secondary">Отмена</a>
+            </form>
+
+        </div>
+
+        <!--Добавление тегов к новости-->
+        <div class="card my-4">
+            <h5 class="card-header">Добавление тегов к новости</h5>
+
+            <!--Список доступных тегов-->
+            <div class="card-body" th:unless="${#lists.isEmpty(allTags)}">
+                <form th:action="@{${base_url}}" th:object="${request}">
+
+                    <button name="url" th:value="${request.url}" type="submit" class="btn btn-dark">Обновить теги</button><br><br>
+
+                    <div th:each="tag : ${allTags}" class="custom-control custom-checkbox">
+                        <input type="checkbox" name="idTags" th:value="${tag.id}" class="custom-control-input"
+                               th:id="${tag.id}" th:checked="${#arrays.isEmpty(request.idTags)}  ? false :
+                               (${#arrays.contains(request.idTags, tag.id)} ?: true)">
+                        <label th:text="${tag.tagName}" class="custom-control-label" th:for="${tag.id}">...</label>
+                    </div>
+
+                </form>
+            </div>
+
+            <!--Нет тегов в БД-->
+            <div class="card-body" th:if="${#lists.isEmpty(allTags)}">
+                <p>Теги не найдены в базе данных...</p>
+                <a th:href="@{/admin/tags}" type="button" class="btn btn-dark">Добавить теги</a>
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div><br><br>
+
+<!-- Footer -->
+<footer th:replace="modules/component :: footer"></footer>
+</body>
+
+</html>

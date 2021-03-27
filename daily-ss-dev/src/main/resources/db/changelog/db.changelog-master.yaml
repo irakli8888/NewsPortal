@@ -1,0 +1,30 @@
+databaseChangeLog:
+  # Создание таблиц
+  - include:
+      file: db/changelog/changes/v_0.0.1_create-tables.sql
+  # Добавление дефолтных тегов
+  - include:
+      file: db/changelog/changes/v_0.0.2_default_tags.yaml
+  # Добавление дефолтных значений и доп. полей в таблицу account
+  - include:
+      file: db/changelog/changes/v_0.0.3_default_accounts.yaml
+  # Fix добавления дефолтных значений
+  - include:
+      file: db/changelog/changes/v_0.0.4.yaml
+  - include:
+      file: db/changelog/changes/v_0_spring-security.yaml
+  # Изменение таблицы комментариев
+  - include:
+      file: db/changelog/changes/v_0.0.5_fix-not-null.yaml
+  # Добавление новости по ссылке
+  - include:
+      file: db/changelog/changes/v_0.0.6.yaml
+  # Популярные новости
+  - include:
+      file: db/changelog/changes/v_0.0.7.yaml
+  - include:
+      file: db/changelog/changes/v_0_roles.yaml
+  - include:
+      file: db/changelog/changes/wru_init-users.yaml
+  - include:
+      file: db/changelog/changes/v_0_fix_not_encoded_passwords.yaml

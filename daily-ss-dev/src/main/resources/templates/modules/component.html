@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ru">
+<head th:fragment="compoment_head">
+    <meta charset="UTF-8">
+    <title>NewsPortal</title>
+
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/blog-home.css}" rel="stylesheet">
+
+    <!-- Bootstrap core JavaScript -->
+    <script th:src="@{//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js}"></script>
+    <script th:src="@{/jquery/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+
+<!--Системные сообщения при добавлении новости по ссылке-->
+<div th:fragment="alert_m(class, title, text)" th:class="'alert alert-' + ${class} + ' alert-dismissible fade show'" role="alert">
+    <span><strong th:text="${title}">...</strong></span>
+    <span th:text="${text}">...</span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<!--Меню-хедер-->
+<nav th:fragment="header" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">NewsPortal.ru</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" th:href="@{/}">Главная</a>
+                </li>
+                <li sec:authorize="hasRole('AUTHOR')" class="nav-item">
+                    <a class="nav-link" th:href="@{/news/add}">Добавить новость</a>
+                </li>
+                <li sec:authorize="hasRole('ADMIN')" class="nav-item">
+                    <a class="nav-link" th:href="@{/admin}">Администрирование</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()" class="nav-item">
+                    <a class="nav-link" href="/login">Войти</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()" class="nav-item">
+                    <a class="nav-link" href="/registration">Зарегистрироваться</a>
+                </li>
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <form id="logout-form" action="/perform_logout" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    </form>
+                    <a class="nav-link" href="#" onclick="$('#logout-form').submit()">
+                        Выйти (<span sec:authentication="name"></span>)
+                    </a>
+                </li>
+                <th:block th:if="${#arrays.contains(@environment.getActiveProfiles(), 'with-replace-user')}">
+                    <li th:replace="auth/replace_user_ui :: replace_user_component">select user</li>
+                </th:block>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!--Популярные новости-->
+<div th:fragment="popular_news" class="card my-4">
+    <h5 class="card-header">Популярные новости</h5>
+    <div class="card-body">
+        <ul class="list-unstyled">
+            <li th:each="nItem : ${popularNews}" class="col-30 text-truncate">
+                <span class="badge badge-warning">Top news</span>
+                <span><a th:href="@{'/news/' + ${nItem.getId()}}" th:text="${nItem.getTitle()}">Новость.....</a></span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!--Модуль поиска-->
+<div th:fragment="search_title" class="card my-4">
+    <h5 class="card-header">Поиск</h5>
+    <div class="card-body">
+        <form class="form-inline">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+
+<!--Footer-->
+<footer th:fragment="footer" class="py-5 bg-dark">
+    <div class="container">
+        <p class="m-0 text-center text-white">Project: NewsPortal 2021</p>
+    </div>
+</footer>
+
+<!--Админ: внутренняя навигация разделов администрирования-->
+<div th:fragment="internal_navigation(submenu, path_section, add, full_list, search_on)" class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+        <form th:action="@{/admin}">
+            <button type="submit" class="btn btn-outline-success">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"></path>
+                </svg>
+            </button>
+        </form>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" th:if="${submenu}">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active" th:if="${add}">
+                    <a class="nav-link" th:href="@{'/admin/' + ${path_section} + '/add'}">Новая запись</a>
+                </li>
+                <li class="nav-item active" th:if="${full_list}">
+                    <a class="nav-link" th:href="@{'/admin/' + ${path_section}}">Полный список</a>
+                </li>
+            </ul>
+            <form th:action="@{'/admin/' + ${path_section}}"  th:if="${search_on}" class="form-inline my-2 my-lg-0">
+                <input name="search" th:value="${search}" class="form-control mr-sm-2" type="search" placeholder="Поиск..." aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Поиск</button>
+            </form>
+        </div>
+
+    </nav>
+</div>
+
+<!--Админ: заголовок раздела-->
+<div th:fragment="section_title(text)" class="container">
+    <h2 class="my-4" th:text="'Администрирование: ' + ${text}"></h2>
+</div>
+
+<!--Карусель фото-->
+<div th:fragment="photo_carousel(media_set)">
+    <div id="carousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <th:block  th:each="media, iState : ${media_set}" >
+                    <div th:class="${iState.first}?'carousel-item active':'carousel-item'">
+                        <img class="img-fluid" th:src="${media}" alt="...">
+                    </div>
+            </th:block>
+        </div>
+        <!-- Элементы управления -->
+        <th:block th:if="${#sets.size(media_set)} > 1">
+            <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Предыдущий</span>
+            </a>
+            <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Следующий</span>
+            </a>
+        </th:block>
+    </div>
+</div>
+
+</body>
+</html>

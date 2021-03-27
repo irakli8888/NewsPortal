@@ -1,0 +1,1 @@
+ALTER TABLE feedback ALTER account_id DROP NOT NULL;

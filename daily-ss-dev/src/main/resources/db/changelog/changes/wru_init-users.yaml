@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: wru_init-users_account
+      author: Nikita Pakhomov
+      context: with-replace-user
+      changes:
+        - sql: INSERT INTO account(username, password, date_time_last_input, login_attempt_input, status_ban, email_verified)
+            VALUES ('WRU-user', null, '2021-01-01 23:59:59.000000', 0, false, true),
+            ('WRU-author', null, '2021-01-01 23:59:59.000000', 0, false, true),
+            ('WRU-admin', null, '2021-01-01 23:59:59.000000', 0, false, true);
+      rollback:
+        - sql:
+            sql: DELETE FROM account WHERE account.username IN ('WRU-user', 'WRU-author', 'WRU-admin');
+  - changeSet:
+      id: wru_init-users_person
+      author: Nikita Pakhomov
+      context: with-replace-user
+      changes:
+        - sql: WITH personData (username, email, first_name, middle_name, last_name, date_of_birth)
+            AS (VALUES ('WRU-user', 'user-no@mail.com', 'Иван', 'Иванович', 'ПОЛЬЗОВАТЕЛЬ', DATE '1970-01-01'),
+            ('WRU-author', 'author-no@mail.com', 'Иван', 'Иванович', 'АВТОР', DATE '1970-01-01'),
+            ('WRU-admin', 'admin-no@mail.com', 'Иван', 'Иванович', 'АДМИН', DATE '1970-01-01'))
+            INSERT INTO person(account_id, email, first_name, middle_name, last_name, date_of_birth)
+            SELECT account.id, email, first_name, middle_name, last_name, date_of_birth
+            FROM personData JOIN account ON personData.username = account.username;
+      rollback:
+        - sql:
+            sql: DELETE FROM person WHERE person.email IN ('user-no@mail.wru', 'author-no@mail.wru', 'admin-no@mail.wru');
+  - changeSet:
+      id: wru_init-users_account-to-roles
+      author: Nikita Pakhomov
+      context: with-replace-user
+      changes:
+        - sql: WITH accountRolesData (username, role_name)
+            AS (VALUES ('WRU-user', 'ROLE_USER'),
+            ('WRU-author', 'ROLE_USER'),
+            ('WRU-admin', 'ROLE_USER'),
+            ('WRU-author', 'ROLE_AUTHOR'),
+            ('WRU-admin', 'ROLE_ADMIN'))
+            INSERT INTO account_role
+            SELECT account.id, role.id FROM accountRolesData
+            JOIN account ON accountRolesData.username = account.username
+            JOIN role ON accountRolesData.role_name = role.name;
+      rollback:
+        - sql:
+            sql: DELETE FROM account_role WHERE account_role.account_id IN
+              (SELECT account.id FROM account WHERE account.username IN ('WRU-user', 'WRU-author', 'WRU-admin'));

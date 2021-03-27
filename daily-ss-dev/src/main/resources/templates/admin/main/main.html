@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="modules/component :: compoment_head">
+    <title>NewsPortal</title>
+</head>
+
+<body>
+<!-- Навигация -->
+<header th:insert="modules/component :: header"></header>
+
+<!-- Контент -->
+<div class="container">
+    <h2 class="my-4">Администрирование</h2>
+    <a type="button" class="btn btn-secondary btn-lg btn-block">Новости</a>
+    <a th:href="@{/admin/accounts}" type="button" class="btn btn-secondary btn-lg btn-block">Аккаунты</a>
+    <a type="button" class="btn btn-secondary btn-lg btn-block">Разное</a>
+    <a th:href="@{/admin/tags}" type="button" class="btn btn-secondary btn-lg btn-block">Тэги</a>
+    <a type="button" class="btn btn-secondary btn-lg btn-block">Отзывы</a>
+    <a th:href="@{/admin/news/by_link/add}" type="button" class="btn btn-secondary btn-lg btn-block">Добавить новость по ссылке</a>
+</div>
+
+<!-- Footer -->
+<div class="fixed-bottom">
+<footer th:replace="modules/component :: footer"></footer>
+</div>
+</body>
+
+</html>

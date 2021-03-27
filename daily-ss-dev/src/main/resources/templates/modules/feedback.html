@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<body>
+
+<!-- Форма добавление комментария-->
+<div th:fragment="feedback_place">
+    <div class="card my-4">
+        <h5 class="card-header">Новый комментарий:</h5>
+        <div class="card-body">
+            <form action="#" th:action="@{/news/{id}/addFeedback(id=${news.id})}" th:method="post">
+                <div class="form-group" style="width: 300%;">
+                    <label class="col-md-4 control-label" for="inputAuthorName">Your name</label>
+                    <div class="col-md-4">
+                        <input id="inputAuthorName" type="text" placeholder="Anonim" class="form-control input-md" th:name="authorName">
+                        <textarea id="feedback_input_text" class="form-control" rows="3" th:name="text"></textarea>
+                        <button type="submit" class="btn btn-primary" onclick="">Добавить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Форма отображения комментария -->
+<div th:fragment="feedback_one(id, name, text)" class="media mb-4">
+    <img class="d-flex mr-3 rounded-circle" th:src="@{/images/feedback_icon.png}" alt="">
+    <form action="#" th:action="@{/news/{id}/deleteFeedback(id=${news.id})}" th:method="post">
+        <input type="hidden" name="feedbackId" th:value="${id}"/>
+        <div class="media-body">
+            <h5 class="mt-0" th:text="${name}">Имя автора</h5>
+            <p th:text="${text}">Текст комментария.....</p>
+            <button type="submit" class="btn btn-primary" onclick="">Удалить</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

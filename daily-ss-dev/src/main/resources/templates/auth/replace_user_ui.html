@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--  pohuy  -->
+</head>
+<body>
+
+<!--
+    Имплементация интерфейса для динамического переключения реально существующих в базе пользователей.
+    ТОЛЬКО ДЛЯ ПРОФИЛЯ "with-replace-user"
+-->
+<li th:fragment="replace_user_component" class="nav-item dropdown pl-2">
+    <a id="dropdownMenuLink" class="btn btn-warning dropdown-toggle" style="padding: calc(0.5rem - 1px) 1rem;" href="#" role="button"
+       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Select User
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+        <a class="dropdown-item" href="#" data-username=""
+           onclick="handleDropdownItemReplaceUserClicked(this)">
+            <span>ANONYMOUS</span>
+            <ul>
+                <li>ROLE_ANONYMOUS</li>
+            </ul>
+        </a>
+        <div class="dropdown-divider"></div>
+        <th:block th:each="user: ${@replaceUserList}">
+            <a class="dropdown-item" href="#" th:attr="data-username=${user.username}"
+               onclick="handleDropdownItemReplaceUserClicked(this)">
+                <span th:text="${user.username}">(username)</span>
+                <ul>
+                    <th:block th:each="role: ${user.getAuthorities()}">
+                        <li th:text="${role.getAuthority()}"></li>
+                    </th:block>
+                </ul>
+            </a>
+        </th:block>
+    </div>
+
+    <form id="replace-user-form" th:action="@{/replace_user}" method="POST">
+        <input id="replace-user-form-username-input" type="hidden" name="username" value="">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    </form>
+
+    <script lang="javascript">
+        const handleDropdownItemReplaceUserClicked = (elem) => {
+            let username = $(elem).data("username");
+            $("#replace-user-form-username-input").val(username);
+            $("#replace-user-form").submit();
+        }
+    </script>
+</li>
+
+</body>

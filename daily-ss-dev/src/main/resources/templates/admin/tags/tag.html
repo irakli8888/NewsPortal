@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="modules/component :: compoment_head">
+    <title>NewsPortal</title>
+</head>
+
+<body>
+
+<!-- Навигация -->
+<header th:insert="modules/component :: header"></header>
+
+<!--Заголовок раздела-->
+<div th:replace="modules/component :: section_title(text=(${tag.id != null} ? 'редактирование' : 'добавление') + ' тега')"></div>
+
+<!--Внутренняя навигация раздела-->
+<div th:replace="modules/component :: internal_navigation(submenu=true, path_section='tags', add=true, full_list=true, search_on=false)"></div><br>
+
+<!--Форма добавления/редактирования-->
+<div class="container">
+    <form th:action="@{/admin/tags/save}" th:object="${tag}" method="post">
+
+        <div class="form-group" th:if="*{id != null}">
+            <label for="tagId">ID тега:</label>
+            <input th:field="*{id}" name="tagId" type="text" class="form-control" id="tagId" readonly>
+        </div>
+        <div class="form-group">
+            <label for="tagName">
+                <span>Название тега:</span>
+                <span th:if="*{id != null}" th:text="'старое значение  <' + ${tagNameOld} + '>'"></span>
+            </label>
+            <input th:field="*{tagName}" name="tagName" type="text" th:class="${#fields.hasErrors('tagName')} ? 'form-control is-invalid' : 'form-control'" id="tagName">
+            <div th:if="${#fields.hasErrors('tagName')}" th:errors="*{tagName}" class="invalid-feedback">Error...</div>
+        </div>
+        <div class="form-group" th:if="*{id != null}">
+            <label for="countNews">Количество новостей:</label>
+            <input th:field="*{countNews}" name="countNews" type="text" class="form-control" id="countNews" readonly>
+        </div>
+
+        <button type="submit" class="btn btn-dark">Добавить</button>
+        <a th:href="@{/admin/tags}" type="button" class="btn btn-outline-secondary">Отмена</a>
+    </form>
+</div><br><br>
+
+
+<!-- Footer -->
+<footer th:replace="modules/component :: footer"></footer>
+</body>
+
+</html>
+

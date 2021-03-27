@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 11-02-2021-001
+      comment: Alter table feedback
+      author: Rafikov Aydar
+      changes:
+        - sqlFile:
+            dbms: 'postgresql'
+            encoding: UTF-8
+            path: db/changelog/fix/alter_table_feedback.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true

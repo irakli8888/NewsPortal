@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 09-02-2021-001
+      comment: To create anonymous users - drop username NOT NULL
+      author: Aleksey Romodin
+      changes:
+        - sql: ALTER  TABLE  account ALTER COLUMN username DROP NOT NULL;
+
+  - changeSet:
+      id: 09-02-2021-002
+      comment: To create anonymous users - drop password NOT NULL
+      author: Aleksey Romodin
+      changes:
+        - sql: ALTER  TABLE  account ALTER COLUMN password DROP NOT NULL;
+
+  - changeSet:
+      id: 09-02-2021-004
+      comment: Add column status_ban
+      author: Aleksey Romodin
+      changes:
+        - sql: ALTER TABLE account ADD COLUMN status_ban boolean NOT NULL DEFAULT false;
+
+  - changeSet:
+      id: 09-02-2021-005
+      comment: Add column role
+      author: Aleksey Romodin
+      changes:
+        - sql: ALTER TABLE account ADD COLUMN role VARCHAR(15);
+
+  - changeSet:
+      id: 09-02-2021-006
+      comment: Create view AccountAdmin
+      author: Aleksey Romodin
+      changes:
+        - sql: CREATE VIEW account_admin AS
+            SELECT a.id,
+            a.username,
+            concat_ws(' ', p.first_name, p.middle_name, p.last_name) AS profile,
+            a.date_time_last_input,
+            a.status_ban,
+            a.role,
+            count(f) AS count_feedback,
+            count(n) AS count_news,
+            sum(CASE WHEN ln.voice IS TRUE THEN 1 ELSE 0 END) AS count_likes,
+            sum(CASE WHEN ln.voice IS FALSE THEN 1 ELSE 0 END) AS count_dis_likes
+            FROM account a
+            LEFT JOIN person p ON a.id = p.account_id
+            LEFT JOIN feedback f ON a.id = f.account_id
+            LEFT JOIN news n ON a.id = n.account_id
+            LEFT JOIN likes_news ln ON a.id = ln.account_id
+            GROUP BY a.id, concat_ws(' ', p.first_name, p.middle_name, p.last_name), a.date_time_last_input, a.status_ban
+            ORDER BY a.id;
+  - changeSet:
+      id: 10-02-2021-007
+      comment: Replace view AccountAdmin
+      author: Aleksey Romodin
+      changes:
+        - sql: CREATE OR REPLACE VIEW account_admin AS
+              SELECT a.id,
+              a.username,
+              concat_ws(' ', p.first_name, p.middle_name, p.last_name) AS profile,
+              a.date_time_last_input,
+              a.status_ban,
+              a.role,
+              count(f) AS count_feedback,
+              count(n) AS count_news,
+              sum(CASE WHEN ln.voice IS TRUE THEN 1 ELSE 0 END) AS count_likes,
+              sum(CASE WHEN ln.voice IS FALSE THEN 1 ELSE 0 END) AS count_dis_likes
+              FROM account a
+              LEFT JOIN person p ON a.id = p.account_id
+              LEFT JOIN feedback f ON a.id = f.account_id
+              LEFT JOIN news n ON a.id = n.account_id
+              LEFT JOIN likes_news ln ON a.id = ln.account_id
+              GROUP BY a.id, a.username, concat_ws(' ', p.first_name, p.middle_name, p.last_name), a.date_time_last_input, a.status_ban, a.role
+              ORDER BY a.id;

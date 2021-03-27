@@ -1,0 +1,123 @@
+#- changeSet:
+#    id: 1613670214247-51
+#    author: Nikita Pakhomov
+#    changes:
+#      - dropColumn:
+#          columnName: role
+#          tableName: account
+
+databaseChangeLog:
+  - changeSet:
+      id: 1613670214247-01
+      author: Nikita Pakhomov
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: rolePK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+            tableName: role
+  - changeSet:
+      id: 1613670214247-02
+      author: Nikita Pakhomov
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: UC_ROLENAME_COL
+            tableName: role
+  - changeSet:
+      id: 1613670214247-03
+      author: Nikita Pakhomov
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: account_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: role_id
+                  type: BIGINT
+            tableName: account_role
+  - changeSet:
+      id: 1613670214247-04
+      author: Nikita Pakhomov
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: account_id
+            baseTableName: account_role
+            constraintName: FK1f8y4iy71kb1arff79s71j0dh
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: account
+            validate: true
+  - changeSet:
+      id: 1613670214247-05
+      author: Nikita Pakhomov (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: role_id
+            baseTableName: account_role
+            constraintName: FKrs2s3m3039h0xt8d5yhwbuyam
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: role
+            validate: true
+  - changeSet:
+      id: 1613670214247-06_setup-roles
+      author: Nikita Pakhomov
+      changes:
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: ROLE_USER
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: ROLE_AUTHOR
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: ROLE_ADMIN
+      rollback:
+        - delete:
+            tableName: role
+            where: name='ROLE_USER'
+        - delete:
+            tableName: role
+            where: name='ROLE_AUTHOR'
+        - delete:
+            tableName: role
+            where: name='ROLE_ADMIN'
+  - changeSet:
+      id: 1613670214247-07
+      author: Nikita Pakhomov
+      comment: Assigns role ROLE_USERNAME to all valid (otkuda u polzovateley null-null aaaaaaaa) accounts
+      changes:
+        - sql: INSERT INTO account_role(account_id, role_id)
+            SELECT account.id, (SELECT role.id from role where name = 'ROLE_USER') As user_id
+            FROM account WHERE account.username IS NOT NULL;
+      rollback:
+        - sql:
+            sql: DELETE FROM account_role;

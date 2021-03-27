@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="modules/component :: compoment_head">
+    <title>NewsPortal</title>
+</head>
+
+<body>
+<!-- Навигация -->
+<header th:insert="modules/component :: header"></header>
+
+<!-- Контент -->
+<div class="container">
+    <form th:action="@{/}" id="formRequest">
+    <div class="row">
+
+        <!-- Сайдбар -->
+        <div class="col-md-4">
+
+            <!-- Теги -->
+            <div th:replace="modules/search :: search_by_tags"></div>
+
+            <!-- Популярные новости -->
+            <div th:replace="modules/component :: popular_news"></div>
+        </div>
+
+        <!-- Колонка с новостями -->
+        <div class="col-md-8">
+
+            <h1 class="my-4">Новостной портал</h1>
+
+            <div th:if="${#lists.isEmpty(response.listNews)}">
+                <h5>Поиск не дал результатов....</h5>
+                <a th:href="@{/}">Показать все</a>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(response.listNews)}">
+                <!-- Блок новости -->
+                <div th:each="itemNews : ${response.listNews}" class="card mb-4">
+
+                    <div class="card-header text-muted">
+                        <p th:text="'Опубликовано: '+${#temporals.format(itemNews.dateTimeCreated, 'dd-MM-yyyy HH:mm:ss')}+'.'">Дата публикации</p>
+                        <span th:text="${#strings.isEmpty(itemNews.url)} ? 'Автор: ' : 'Источник: '"></span>
+                        <span><a th:href="${#strings.isEmpty(itemNews.url)} ?'#' : ${itemNews.url}" th:text="${itemNews.authorName}">Авторство</a></span>
+                    </div>
+
+                    <a  th:unless="${#sets.isEmpty(itemNews.mediaSet)}" th:href="${#strings.isEmpty(itemNews.url)} ? ('@{/news/' + ${itemNews.id} + '}') : ${itemNews.url}">
+                        <img class="card-img-top" th:src="'/img/' + ${itemNews.mediaSet.stream().findFirst().get().getId()} + '.jpeg'" th:alt="${itemNews.title}">
+                    </a>
+
+                    <div class="card-body">
+                        <h2 class="card-title" th:text="${itemNews.title}">Заголовок</h2>
+                        <p class="card-text" th:text="${#strings.isEmpty(itemNews.url)} ? (${itemNews.textNews.length() > 250 } ? (${#strings.substringBefore(itemNews.textNews, 250)} + '...') : ${itemNews.textNews}) : ${itemNews.textNews}">Текст новости</p>
+                        <a th:href="${#strings.isEmpty(itemNews.url)} ? @{/news/} + ${itemNews.id} : ${itemNews.url}" th:text="${#strings.isEmpty(itemNews.url)} ? ' Читать &rarr;' : ' Подробнее &rarr;'" class="btn btn-primary">Подробности &rarr;</a>
+                    </div>
+
+                    <div class="card-footer">
+                        <span>Теги: </span>
+                        <span th:each="stag : ${itemNews.tags}" th:text="${stag.tagName}" class="badge badge-primary mr-2">...</span>
+                    </div>
+                </div>
+
+                <!-- Пагинация -->
+                <ul class="pagination justify-content-center mb-4"  th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}">
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item"  th:if="${response.pageNumber > 0}">
+                                <a class="page-link" th:href="@{${urlBuilder.replaceQueryParam('pageNumber', response.pageNumber - 1).build().toUriString()}}" aria-label="Назад">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Назад</span>
+                                </a>
+                            </li>
+
+                            <li th:class="${response.pageNumber == (pn - 1)} ? 'page-item active' : 'page-item' " th:each="pn: ${#numbers.sequence(((response.pageNumber - 3) < 0 ? 1 : (response.pageNumber - 2)), ((response.pageNumber + 3) > (response.totalPage - 1) ? response.totalPage : (response.pageNumber + 4)))}">
+                                <a class="page-link" th:href="@{${urlBuilder.replaceQueryParam('pageNumber', pn - 1).build().toUriString()}}">
+                                    <span aria-hidden="true" th:text="${pn}">...</span>
+                                </a>
+                            </li>
+
+                            <li class="page-item"  th:unless="${response.pageNumber == (response.totalPage - 1)}">
+                                <a class="page-link" th:href="@{${urlBuilder.replaceQueryParam('pageNumber', response.pageNumber + 1).build().toUriString()}}" aria-label="Вперед">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Вперед</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    </form>
+</div>
+
+<!-- Footer -->
+<footer th:replace="modules/component :: footer"></footer>
+
+</body>
+
+</html>
+

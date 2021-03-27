@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="modules/component :: compoment_head">
+    <title>NewsPortal</title>
+</head>
+
+<body>
+<!-- Навигация -->
+<header th:insert="modules/component :: header"></header>
+
+<!--Заголовок раздела-->
+<div th:replace="modules/component :: section_title(text='список тегов')"></div>
+
+<!-- Внутренняя навигация -->
+<div th:replace="modules/component :: internal_navigation(submenu=true, path_section='tags', add=true, full_list=true, search_on=true)"></div><br>
+
+<!--Сообщение о пустом списке-->
+<div class="container" th:if="${#arrays.isEmpty(tags)}">
+    <h4>По вашему запросу ничего не найдено...</h4>
+</div>
+
+<!--Статистика-->
+<div class="container" th:unless="${#arrays.isEmpty(tags)}">
+    <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            Найдено тегов:
+            <span th:text="${#arrays.length(tags)}" class="badge badge-primary badge-pill">...</span>
+        </li>
+    </ul>
+</div><br>
+
+<!--Список тегов-->
+<div class="container" th:unless="${#arrays.isEmpty(tags)}">
+    <!--Таблица-->
+    <table class="table table-striped table-sm">
+        <thead class="thead-inverse">
+        <tr>
+            <th>№/id</th>
+            <th>Название</th>
+            <th>Кол-во новостей</th>
+            <th>Редактировать</th>
+            <th>Удалить</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tag : ${tags}">
+            <th th:text="${tag.id}" scope="row">...</th>
+            <td th:text="${tag.tagName}">...</td>
+            <td th:text="${tag.countNews}">...</td>
+            <td>
+                <!-- Редактирование записи -->
+                <form th:action="@{/admin/tags/edit}">
+                    <button name="tagId" th:value="${tag.id}" type="submit" class="btn btn-warning btn-sm">Редактировать</button>
+                </form>
+            </td>
+            <td>
+                <!-- Удаление записи-->
+                <form th:action="@{/admin/tags/delete}" method="post">
+
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                            th:data-target="'#deleteModal' + ${tag.id}"
+                            th:disabled="${tag.countNews == 0} ? false : true">
+                        Удалить
+                    </button>
+
+                    <!-- Модальное окно подтверждения удаления -->
+                    <div class="modal fade" th:id="deleteModal + ${tag.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteButton">Удаление записи</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Вы действительно хотите удалить запись?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                    <button th:value="${tag.id}" name="tagId" type="submit" class="btn btn-primary">Удалить</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div><br><br>
+
+<!-- Footer -->
+<footer th:replace="modules/component :: footer"></footer>
+</body>
+
+</html>
+

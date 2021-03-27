@@ -1,0 +1,13 @@
+databaseChangeLog:
+- changeSet:
+    id: 12-02-2021-001
+    comment: Hot fix
+    author: Aleksey Romodin
+    changes:
+      - sqlFile:
+          dbms: 'postgresql'
+          encoding: UTF-8
+          path: db/changelog/default-values/default_accounts.sql
+          relativeToChangelogFile: false
+          splitStatements: true
+          stripComments: true

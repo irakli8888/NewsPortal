@@ -1,0 +1,8 @@
+body {
+    background-color: #fafafa;
+}
+
+.form-group.required > label:after {
+    content: " *";
+    color: #dc3545;
+}

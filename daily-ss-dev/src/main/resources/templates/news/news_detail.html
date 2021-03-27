@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="modules/component :: compoment_head">
+    <title>NewsPortal</title>
+</head>
+
+<body>
+<!-- Навигация -->
+<header th:insert="modules/component :: header"></header>
+
+<!-- Контент -->
+<div class="container">
+
+    <div class="row">
+
+        <!-- Сайдбар -->
+        <div class="col-md-4">
+
+            <!-- Поиск -->
+            <div th:replace="modules/component :: search_title"></div>
+
+            <!-- Популярные новости -->
+            <div th:replace="modules/component :: popular_news"></div>
+
+        </div>
+
+
+        <!-- Новость с момментариями-->
+        <div class="col-lg-8">
+            <h1 class="mt-4" th:text="${news.title}">Заголовок новости</h1>
+            <p class="lead">
+                <a href="#" th:text="'Автор: '+${news.authorName}">Автор</a>
+            </p>
+            <hr>
+            <p th:text="'Опубликовано '+${#temporals.format(news.dateTimeCreated, 'dd-MM-yyyy HH:mm:ss')}+'.'">Дата публикации</p>
+            <hr>
+            <th:block th:if="${#sets.size(news.mediaSet)!=0}" th:replace="modules/component :: photo_carousel(${news.mediaSet})" />
+            <hr>
+            <p class="lead">Возможные тезисы.....</p>
+            <p th:text="${news.textNews}">Текст новости</p>
+            <a th:if="${news.url}" th:href="${news.url}" class="btn btn-primary">Подробнее &rarr;</a>
+            <hr>
+
+            <!-- Форма добавление комментария-->
+            <div th:replace="modules/feedback :: feedback_place"></div>
+
+            <!-- Список комментариев -->
+            <div th:each="feedback : ${feedbacks}">
+                <div th:replace="modules/feedback :: feedback_one(${feedback.id}, ${feedback.authorName}, ${feedback.comment})"></div>
+            </div>
+
+
+<!-- todo: сделать коментарии с потомками-->
+
+<!--            &lt;!&ndash; Комментарий с потомком&ndash;&gt;-->
+<!--            <div class="media mb-4">-->
+<!--                <img class="d-flex mr-3 rounded-circle" th:src="@{/images/feedback_icon.png}" alt="">-->
+<!--                <div class="media-body">-->
+<!--                    <h5 class="mt-0">Имя автора</h5>-->
+<!--                    Текст комментария.....-->
+<!--                    <br><br>-->
+<!--                    <div th:replace="modules/feedback.html :: feedback_one"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer th:replace="modules/component :: footer"></footer>
+
+</body>
+
+</html>
+

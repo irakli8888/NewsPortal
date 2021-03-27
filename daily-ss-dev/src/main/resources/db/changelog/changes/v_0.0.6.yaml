@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 13-02-2021-001
+      comment: Create view tag_short
+      author: Aleksey Romodin
+      changes:
+        - sql: CREATE OR REPLACE VIEW tag_short AS
+               SELECT id, tag_name FROM tag
+               ORDER BY tag_name;
+  - changeSet:
+      id: 13-02-2021-002
+      comment: Add column < url > for table < news >
+      author: Aleksey Romodin
+      changes:
+        - sql: ALTER TABLE news ADD COLUMN url VARCHAR;

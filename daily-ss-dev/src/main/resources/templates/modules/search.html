@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<body>
+
+<!--Меню поиска по тегам-->
+<div th:fragment="search_by_tags" class="card my-4">
+    <h5 class="card-header">Фильтрация новостей</h5>
+    <div class="card-body mt-0">
+
+        <ul class="list-group list-group-flush mt-0">
+            <!--Статистика-->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                Найдено новостей:
+                <span th:text="${response.totalNews}" class="badge badge-primary badge-pill">0</span>
+            </li>
+
+            <!-- Поиск по заголовку статьи -->
+            <li class="list-group-item mt-0">
+                <input class="form-control" name="searchTitle" th:value="${response.searchTitle}" type="search" placeholder="Поиск по заголовку..." aria-label="Поиск по заголовку...">
+            </li>
+
+            <li class="list-group-item">
+
+                <button type="button" class="btn btn-primary btn-sm" id="addTag">Добавить тег</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="removeAll">Очистить список</button>
+
+                <!-- Доступные теги в БД -->
+                <div class="input-group mt-2">
+                    <input class="form-control" id="inTag" type=text list=tagList   aria-label="Список тегов" placeholder="Поиск тега" aria-describedby="addTag">
+                    <datalist id=tagList>
+                        <select  class="form-control"  aria-label="Список тегов">
+                            <option th:each="tag : ${response.tagsForFilter}" th:text="${tag.tagName}">...</option>
+                        </select>
+                    </datalist>
+                </div>
+
+                <!-- Выбранные теги -->
+                <div class="list-group list-group-flush" id="selected">
+                    <div th:each="tag : ${response.filterTags}" class="form-inline mt-2 small"  th:id="'div' + ${#strings.replace(tag, ' ', '_')}" >
+                        <input th:value="${tag}"  name="filterTags" class = "form-control mr-sm-2" readonly/>
+                        <button type="button" class="close" th:id="${#strings.replace(tag, ' ', '_')}"
+                                th:attr="onclick= 'removeElement(this.id)'">&times;</button>
+                    </div>
+                </div>
+
+            </li>
+            <button type="submit" class="btn btn-primary btn-sm mt-2">Отфильтровать новости</button>
+            <a th:href="@{/}" type="button" class="btn btn-outline-primary btn-sm mt-2 mb-0">Показать все</a>
+        </ul>
+
+        <script>
+            let setTags = new Set();
+
+            document.addEventListener("DOMContentLoaded", loadDefaultSelectTag);
+
+            function loadDefaultSelectTag() {
+                document.getElementsByName("filterTags").forEach(fTag => setTags.add(fTag.value));
+            }
+
+            const printSet = document.getElementById('selected');
+            const inTag = document.getElementById("inTag");
+            const bAddTag = document.getElementById("addTag");
+            let regexMaskTag = /^([A-zА-я]{1,16}(?:\s[A-zА-я]{1,16}){0,2})$/;
+
+            //Проверка на соответствие паттерну
+            inTag.oninput = function () {
+                if (regexMaskTag.test(inTag.value) || inTag.value === "") {
+                    inTag.className = "form-control";
+                    bAddTag.removeAttribute("disabled");
+                } else {
+                    inTag.className = "form-control is-invalid";
+                    bAddTag.setAttribute("disabled", "disabled");
+                }
+            }
+
+            //Добавление тега в список поиска
+            $("#addTag").click(function(){
+                if (regexMaskTag.test(inTag.value)) {
+                    let nameTag = inTag.value;
+                    let id = nameTag.split(" ").join("_");
+                    let divTag = '<div class="form-inline mt-2 small" id="div' + id + '">' +
+                        '<input value="' + nameTag + '" name="filterTags" class="form-control mr-sm-2" readOnly/>' +
+                        '<button type="button" class="close" id="' + id + '" onclick=removeElement("' + id + '")>&times;</button>' +
+                        '</div>';
+
+                    if (!setTags.has(nameTag)) {
+                        console.log('Добавление в фильтр -> ' + inTag.value);
+                        setTags.add(nameTag);
+                        printSet.insertAdjacentHTML('afterbegin', divTag);
+                    }
+                    inTag.value = "";
+                } else {
+                    inTag.className = "form-control is-invalid";
+                }
+            })
+
+            $("#removeAll").click(function (){
+                inTag.value = "";
+                printSet.textContent = "";
+                setTags.clear();
+            })
+
+            function removeElement(v) {
+                setTags.forEach(item => console.log('- ' + item));
+                let nameTag = v.split("_").join(" ");
+                console.log('Удаление из фильтра -> ' + nameTag);
+                document.getElementById('div' + v).remove();
+                setTags.delete(nameTag);
+            }
+
+        </script>
+
+    </div>
+    <div>
+    </div>
+</div>
+
+
+</body>
+
+</html>
+

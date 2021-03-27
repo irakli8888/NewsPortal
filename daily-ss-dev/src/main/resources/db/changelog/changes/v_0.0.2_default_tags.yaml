@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 06-02-2021-001
+      comment: Insert default tags
+      author: Aleksey Romodin
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: select count(*) from tag;
+      changes:
+        - sqlFile:
+            dbms: 'postgresql'
+            encoding: UTF-8
+            path: db/changelog/default-values/default_tags.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true

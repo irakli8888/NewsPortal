@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head th:replace="modules/component.html :: compoment_head">
+    <title>NewsPortal</title>
+</head>
+
+<body>
+<!-- Навигация -->
+<header th:insert="modules/component.html :: header"></header>
+
+<!-- Контент -->
+<div class="container">
+
+    <div class="row">
+
+        <!-- Сайдбар -->
+        <div class="col-md-4">
+
+            <!-- Поиск -->
+            <div th:replace="modules/component :: search_title"></div>
+
+            <!-- Популярные новости -->
+            <div th:replace="modules/component :: popular_news"></div>
+
+        </div>
+
+        <!-- Новость -->
+        <div class="col-lg-8">
+            <h1 class="mt-4">Разместить новость</h1>
+
+            <!-- Текстовая часть -->
+            <div class="card my-4">
+                <div class="card-body">
+                    <form action="#" th:action="@{/news/add}" th:object="${newsDto}" method="POST"
+                          enctype="multipart/form-data">
+                        <h5 class="card-header">Заголовок:</h5>
+                        <div class="form-group">
+                            <textarea class="form-control" rows="1" th:field="*{title}"></textarea>
+                        </div>
+                        <h5 class="card-header">Текст:</h5>
+                        <div class="form-group">
+                            <textarea class="form-control" rows="10" th:field="*{textNews}"></textarea>
+                        </div>
+                        <h5 class="card-header">Приложить изображение:</h5>
+                        <div class="form-group">
+                            <input type="file" class="form-control-file" th:field="*{files}" multiple="multiple">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Опубликовать</button>
+                    </form>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer th:replace="modules/component.html :: footer"></footer>
+
+</body>
+
+</html>
+
